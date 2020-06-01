@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+
+{% block contents %}
+
+<table class="table table-boardered">
+    <tbody>
+        <tr>
+            <td colspan="2">{{result.title}}</td>
+        </tr>
+        <tr>
+            <td>{{result.name}}</td>
+            <td class="text-right">{{result.pubdate | formatdatetime}}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><div style="min-height:200px;">{{result.contents}}</div></td>
+        </tr>
+    </tbody>
+</table>
+
+<a class="btn btn-primary" href="{{url_for('board.lists', page=page, search=search, keyword=keyword)}}">리스트</a>
+{% if session["id"] == result.writer_id %}
+<a class="btn btn-danger float-right ml-2" href="{{url_for('board.board_delete', idx=result.id)}}">글삭제</a>
+<a class="btn btn-warning float-right" href="{{url_for('board.board_edit', idx=result.id)}}">글수정</a>
+{% endif %}
+{% endblock %}

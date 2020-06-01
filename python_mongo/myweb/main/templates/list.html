@@ -1,0 +1,84 @@
+{% extends "main.html" %}
+
+{% block contents %}
+<script>
+    function search(){
+        var v_search = document.getElementById("search").value;
+        var v_keyword = document.getElementById("keyword").value;
+
+        if(v_search == "" || v_keyword == ""){
+            return false; 
+        } else{
+            self.location.href = 
+            "{{url_for('board.lists')}}?search=" + v_search + "&keyword=" +v_keyword;
+        }
+    }
+</script>
+
+{% if datas.count() > 0 %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <td>번호</td>
+            <td>제목</td>
+            <td>이름</td>
+            <td>날짜</td>
+            <td>조회수</td>
+        </tr>
+    </thead>
+    <tbody>
+        <!--반복되는 구간-->
+        {% for data in datas %}
+        <tr>
+            <td>{{loop.index + ((page - 1) * limit)}}</td>
+            <td><a href="{{url_for('board.board_view', idx=data._id, page=page, search=search, keyword=keyword)}}">{{data.title}}</a></td>
+            <td>{{data.name}}</td>
+            <td>{{data.pubdate | formatdatetime}}</td>
+            <td>{{data.view}}</td>
+        </tr>
+        {% endfor %}
+        <!--반복되는 구간 끝-->
+    </tbody>
+</table>
+
+<ul class="pagination justify-content-center">
+{% if block_start - 1 > 0 %}
+    <li class="page-item"><a class="page-link" href="{{url_for('board.lists', page=block_start - 1)}}">[이전]</a></li>
+{% endif %}
+
+{% for i in range(block_start, block_last + 1) %}
+    {% if i > last_page_num %}
+    <li class="page-item"><a class="page-link disable">{{ i }}</a></li>
+    {% else %}
+        {% if i == page %}
+        <li class="page-item"><a class="page-link active text-warning">{{ i }}</a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{{url_for('board.lists', page=i, search=search, keyword=keyword)}}">{{i}}</a></li>
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{% if block_last < last_page_num %}
+<li class="page-item"><a class="page-link" href="{{url_for('board.lists', page=block_last + 1, search=search, keyword=keyword)}}">[다음]</a></li>
+{% endif %}
+</ul>
+
+<div class="text-center">
+<select name="search" id="search">
+    <option value="" {% if search == '' or search == -1 %} selected {% endif %}>검색대상</option>
+    <option value="0" {% if search == 0 %} selected {% endif %}>제목</option>
+    <option value="1" {% if search == 1 %} selected {% endif %}>내용</option>
+    <option value="2" {% if search == 2 %} selected {% endif %}>제목+내용</option>
+    <option value="3" {% if search == 3 %} selected {% endif %}>작성자</option>
+</select>
+<input type="text" name="keyword" id="keyword" {% if keyword != "" %} value ={{keyword}} {% endif %}>
+<input type="button" value="검색" onclick="search()" class="btn btn-primary btn-sm">
+</div>
+
+{% else %} 
+<h3>데이터가 없습니다.</h3>
+{% endif %}
+
+<a href="{{url_for('board.board_write')}}" class="btn btn-primary">글작성</a>
+
+{% endblock %}
